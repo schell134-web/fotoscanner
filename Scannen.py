@@ -1,15 +1,7 @@
-from tensorflow.keras.applications.resnet50 import ResNet50, preprocess_input, decode_predictions
-from tensorflow.keras.preprocessing import image
-
+import importlib
 import os
 import re
-os.environ['TCL_LIBRARY'] = r'C:\Users\Steamlink\AppData\Local\Programs\Python\Python311\tcl\tcl8.6'
-os.environ['TK_LIBRARY'] = r'C:\Users\Steamlink\AppData\Local\Programs\Python\Python311\tcl\tk8.6'
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-
 import sys
-import cv2
-import numpy as np
 import pickle
 import threading
 import tkinter as tk
@@ -17,14 +9,59 @@ from tkinter import filedialog
 from tkinter.scrolledtext import ScrolledText
 from tkinter import messagebox
 
-from deepface import DeepFace
-import mediapipe as mp
-from mediapipe.tasks import python
-from mediapipe.tasks.python import vision
+try:
+    keras_app = importlib.import_module("tensorflow.keras.applications.resnet50")
+    keras_image = importlib.import_module("tensorflow.keras.preprocessing.image")
+except ModuleNotFoundError:
+    try:
+        keras_app = importlib.import_module("keras.applications.resnet50")
+        keras_image = importlib.import_module("keras.preprocessing.image")
+    except ModuleNotFoundError as exc:
+        raise ModuleNotFoundError(
+            "Keras/TensorFlow is niet geïnstalleerd. Installeer met: pip install tensorflow keras"
+        ) from exc
 
-import openpyxl
-from openpyxl.utils import get_column_letter
-from openpyxl.styles import Font
+ResNet50 = keras_app.ResNet50
+preprocess_input = keras_app.preprocess_input
+decode_predictions = keras_app.decode_predictions
+image = keras_image
+
+try:
+    import cv2
+except ModuleNotFoundError as exc:
+    raise ModuleNotFoundError("OpenCV is niet geïnstalleerd. Installeer met: pip install opencv-python") from exc
+
+try:
+    import numpy as np
+except ModuleNotFoundError as exc:
+    raise ModuleNotFoundError("NumPy is niet geïnstalleerd. Installeer met: pip install numpy") from exc
+
+try:
+    from deepface import DeepFace
+except ModuleNotFoundError as exc:
+    raise ModuleNotFoundError("DeepFace is niet geïnstalleerd. Installeer met: pip install deepface") from exc
+except ValueError as exc:
+    raise ValueError(
+        "DeepFace heeft aanvullende TensorFlow-compatibiliteit nodig. Installeer tf-keras met: pip install tf-keras"
+    ) from exc
+
+try:
+    import mediapipe as mp
+    from mediapipe.tasks import python
+    from mediapipe.tasks.python import vision
+except ModuleNotFoundError as exc:
+    raise ModuleNotFoundError("MediaPipe is niet geïnstalleerd. Installeer met: pip install mediapipe") from exc
+
+try:
+    import openpyxl
+    from openpyxl.utils import get_column_letter
+    from openpyxl.styles import Font
+except ModuleNotFoundError as exc:
+    raise ModuleNotFoundError("openpyxl is niet geïnstalleerd. Installeer met: pip install openpyxl") from exc
+
+os.environ['TCL_LIBRARY'] = r'C:\Users\Steamlink\AppData\Local\Programs\Python\Python311\tcl\tcl8.6'
+os.environ['TK_LIBRARY'] = r'C:\Users\Steamlink\AppData\Local\Programs\Python\Python311\tcl\tk8.6'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # ==============================
 # CONFIG
